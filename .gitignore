@@ -1,0 +1,8 @@
+# Jetbrains
+.idea/
+
+# Dist
+bin/
+
+# Config
+config.yaml

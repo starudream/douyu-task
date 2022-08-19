@@ -1,0 +1,9 @@
+debug: false
+log:
+  level: debug
+douyu:
+  did: abc
+  uid: 123
+  auth: xyz
+  stick:
+    remaining: 9999
