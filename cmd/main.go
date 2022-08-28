@@ -17,11 +17,19 @@ import (
 )
 
 func main() {
+	app.Add(startup)
 	app.Add(cron)
 	err := app.Go()
 	if err != nil {
 		log.Fatal().Msgf("app init fail: %v", err)
 	}
+}
+
+func startup(context.Context) error {
+	if config.GetBool("startup") {
+		NewRenewal().Run()
+	}
+	return nil
 }
 
 func cron(context.Context) error {
