@@ -41,6 +41,13 @@ douyu:
 - `chrome://settings/cookies/detail?site=douyu.com`
 - `chrome://settings/cookies/detail?site=passport.douyu.com`
 
+### Dingtalk
+
+| Name   | Type   | Comment               |
+|--------|--------|-----------------------|
+| token  | string | access token          |
+| secret | string | secret (not required) |
+
 ### Docker
 
 ![Version](https://img.shields.io/docker/v/starudream/douyu-task?style=for-the-badge)

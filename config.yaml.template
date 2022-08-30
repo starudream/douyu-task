@@ -5,5 +5,9 @@ douyu:
   did: abc
   uid: 123
   auth: xyz
+  ltp0: asd
   stick:
     remaining: 9999
+dingtalk:
+  token: qwe
+  secret: zxc
