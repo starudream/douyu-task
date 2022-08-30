@@ -10,7 +10,13 @@ import (
 var client *Client
 
 func init() {
-	client = New(config.GetString("douyu.did"), config.GetString("douyu.uid"), config.GetString("douyu.auth"))
+	client = New(config.GetString("douyu.did"), config.GetString("douyu.uid"), config.GetString("douyu.auth"), config.GetString("douyu.ltp0"))
+	if client.ltp0 != "" {
+		err := client.Refresh()
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func TestNewWithCookie(t *testing.T) {

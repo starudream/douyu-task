@@ -30,13 +30,16 @@ douyu:
 
 ### Douyu
 
-| Name            | Type   | Require | Comment                             |
-|-----------------|--------|---------|-------------------------------------|
-| did             | string | T       | cookie, dy_did                      |
-| uid             | string | T       | cookie, acf_uid                     |
-| auth            | string | T       | cookie, acf_auth                    |
-| cookie          | string | T       | cookie                              |
-| stick.remaining | int    | F       | room id to send remaining free gift |
+| Name            | Type   | Require | Comment                             | Cookie                    |
+|-----------------|--------|---------|-------------------------------------|---------------------------|
+| did             | string | T       |                                     | dy_did (douyu.com)        |
+| uid             | string | T       |                                     | acf_uid (douyu.com)       |
+| auth            | string | T/F     | expire in 7 days                    | acf_auth (douyu.com)      |
+| ltp0            | string | T/F     | to refresh auth token               | LTP0 (passport.douyu.com) |
+| stick.remaining | int    | F       | room id to send remaining free gift |                           |
+
+- `chrome://settings/cookies/detail?site=douyu.com`
+- `chrome://settings/cookies/detail?site=passport.douyu.com`
 
 ### Docker
 

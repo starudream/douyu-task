@@ -11,13 +11,15 @@ type Client struct {
 	did  string // cookie: dy_did
 	uid  string // cookie: acf_uid
 	auth string // cookie: acf_auth
+	ltp0 string // cookie: ltp0
 }
 
-func New(did, uid, auth string) *Client {
+func New(did, uid, auth, ltp0 string) *Client {
 	return &Client{
 		did:  did,
 		uid:  uid,
 		auth: auth,
+		ltp0: ltp0,
 	}
 }
 
