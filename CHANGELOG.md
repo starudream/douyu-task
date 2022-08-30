@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/starudream/douyu-task/compare/v1.1.0...v1.2.0) (2022-08-30)
+
+
+### Features
+
+* add LTP0 to refresh token ([bc17203](https://github.com/starudream/douyu-task/commit/bc17203b74bb516b84949199b5ac30329d3985aa))
+
 ## [1.1.0](https://github.com/starudream/douyu-task/compare/v1.0.0...v1.1.0) (2022-08-28)
 
 
