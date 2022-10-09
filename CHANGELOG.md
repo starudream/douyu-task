@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/starudream/douyu-task/compare/v1.2.0...v1.2.1) (2022-10-09)
+
+
+### Performance Improvements
+
+* perfect use go 1.19 ([b3aae5e](https://github.com/starudream/douyu-task/commit/b3aae5ec74f607b6059afb4e608209c108114aae))
+
 ## [1.2.0](https://github.com/starudream/douyu-task/compare/v1.1.0...v1.2.0) (2022-08-30)
 
 
