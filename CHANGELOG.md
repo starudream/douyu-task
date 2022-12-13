@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/starudream/douyu-task/compare/v1.3.0...v1.3.1) (2022-12-13)
+
+
+### Features
+
+* **deps:** bump dependencies ([ce741b4](https://github.com/starudream/douyu-task/commit/ce741b4788e7abe9184ccc78f3cefc5d44ebc3e7))
+
 ## [1.3.0](https://github.com/starudream/douyu-task/compare/v1.2.1...v1.3.0) (2022-12-02)
 
 
