@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/starudream/douyu-task/compare/v1.3.2...v1.4.0) (2023-03-01)
+
+
+### Features
+
+* bump lib ([3c0f5e2](https://github.com/starudream/douyu-task/commit/3c0f5e2776cc650274b18bbf5847e98360aaba19))
+
+
+### Bug Fixes
+
+* fix bot ([865fba6](https://github.com/starudream/douyu-task/commit/865fba636726a6660608e429661c8b47e08a7e19))
+
 ## [1.3.2](https://github.com/starudream/douyu-task/compare/v1.3.1...v1.3.2) (2023-02-03)
 
 
