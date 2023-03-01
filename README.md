@@ -48,6 +48,13 @@ douyu:
 | token  | string | access token          |
 | secret | string | secret (not required) |
 
+### Telegram
+
+| Name    | Type   | Comment |
+|---------|--------|---------|
+| token   | string | token   |
+| chat_id | string |         |
+
 ### Docker
 
 ![Version](https://img.shields.io/docker/v/starudream/douyu-task?sort=semver&style=for-the-badge)

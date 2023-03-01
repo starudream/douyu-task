@@ -11,3 +11,6 @@ douyu:
 dingtalk:
   token: qwe
   secret: zxc
+telegram:
+  token: okm
+  chat_id: 123
