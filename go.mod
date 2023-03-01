@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/starudream/go-lib v1.11.0
+	github.com/starudream/go-lib v1.11.1
 	golang.org/x/net v0.7.0
 )
 
