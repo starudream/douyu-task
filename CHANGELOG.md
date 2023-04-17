@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/starudream/douyu-task/compare/v1.4.0...v1.5.0) (2023-04-17)
+
+
+### Features
+
+* add fans glow sticks ([c418782](https://github.com/starudream/douyu-task/commit/c41878206940e54c5a3ff8b0db869e9c60613dcb))
+
 ## [1.4.0](https://github.com/starudream/douyu-task/compare/v1.3.2...v1.4.0) (2023-03-01)
 
 
