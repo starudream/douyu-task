@@ -98,8 +98,8 @@ func (r *Renewal) Send() error {
 		return fmt.Errorf("list gifts fail: %v", err)
 	}
 
-	stick := gifts.Find(api.GiftGlowSticks).GetCount()
-	if stick == 0 {
+	id := gifts.NotEmpty(api.GiftFansGlowSticks, api.GiftGlowSticks)
+	if id == -1 {
 		return fmt.Errorf("no free gift")
 	}
 
@@ -108,16 +108,18 @@ func (r *Renewal) Send() error {
 		return fmt.Errorf("list badges fail: %v", err)
 	}
 
+	var stick int
+
 	for _, badge := range badges {
 		if badge.Room == r.stickRemaining {
 			continue
 		}
-		gifts, err = c.SendGift(badge.Room, api.GiftGlowSticks, 1)
+		gifts, err = c.SendGift(badge.Room, id, 1)
 		if err != nil {
 			log.Error().Msgf("send gift fail: %v", err)
 			continue
 		}
-		stick = gifts.Find(api.GiftGlowSticks).GetCount()
+		stick = gifts.Find(id).GetCount()
 		if stick == 0 {
 			log.Error().Msg("no remaining free gift")
 			break
@@ -130,7 +132,7 @@ func (r *Renewal) Send() error {
 		return nil
 	}
 
-	gifts, err = c.SendGift(r.stickRemaining, api.GiftGlowSticks, stick)
+	gifts, err = c.SendGift(r.stickRemaining, id, stick)
 	if err != nil {
 		return fmt.Errorf("send gift fail: %v", err)
 	}

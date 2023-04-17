@@ -21,6 +21,15 @@ func (gs *Gifts) Find(id int) *Gift {
 	return nil
 }
 
+func (gs *Gifts) NotEmpty(ids ...int) int {
+	for i := 0; i < len(ids); i++ {
+		if gs.Find(ids[i]).GetCount() > 0 {
+			return ids[i]
+		}
+	}
+	return -1
+}
+
 // Gift 礼物
 type Gift struct {
 	Id       int    `json:"id"`       // id
@@ -42,8 +51,12 @@ func (gift *Gift) GetCount() int {
 	return gift.Count
 }
 
-// GiftGlowSticks 粉丝荧光棒
-const GiftGlowSticks = 268
+const (
+	// GiftGlowSticks 粉丝荧光棒
+	GiftGlowSticks = 268
+	// GiftFansGlowSticks 钻粉粉丝荧光棒
+	GiftFansGlowSticks = 2358
+)
 
 type SendGiftResp struct {
 	CommonResp
