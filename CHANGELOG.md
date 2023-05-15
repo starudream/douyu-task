@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/starudream/douyu-task/compare/v1.5.0...v1.6.0) (2023-05-15)
+
+
+### Features
+
+* add custom cron spec and daily refresh ([e2ad774](https://github.com/starudream/douyu-task/commit/e2ad774ad5507fa93781592f30befd666c80bd37))
+
 ## [1.5.0](https://github.com/starudream/douyu-task/compare/v1.4.0...v1.5.0) (2023-04-17)
 
 
