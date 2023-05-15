@@ -19,6 +19,15 @@ douyu:
   auth: xyz
   stick:
     remaining: 9999
+dingtalk:
+  token: qwe
+  secret: zxc
+telegram:
+  token: okm
+  chat_id: 123
+cron:
+  refresh: "0 0 1 * * *"
+  send_gift: "0 0 12 * * 0"
 ```
 
 ### Global
