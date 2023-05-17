@@ -56,6 +56,15 @@ func (r *Renewal) Name() string {
 func (r *Renewal) Run() {
 	c := api.New(r.did, r.uid, r.auth, r.ltp0)
 
+	if r.ltp0 != "" {
+		err := c.Refresh()
+		if err != nil {
+			log.Error().Msgf("refresh fail: %v", err)
+			_ = bot.Send("刷新认证失败：" + err.Error())
+			return
+		}
+	}
+
 	if r.noSend {
 		_, _, err := r.Badges(c, true)
 		if err != nil {
@@ -75,13 +84,6 @@ func (r *Renewal) Run() {
 }
 
 func (r *Renewal) Send(c *api.Client) error {
-	if r.ltp0 != "" {
-		err := c.Refresh()
-		if err != nil {
-			return fmt.Errorf("refresh fail: %v", err)
-		}
-	}
-
 	gifts, err := c.ListGifts()
 	if err != nil {
 		return fmt.Errorf("list gifts fail: %v", err)
