@@ -11,20 +11,25 @@
 
 ```yaml
 debug: false
+startup: false
 log:
   level: debug
 douyu:
-  did: abc
-  uid: 123
-  auth: xyz
+  room: 9999
+  did: xxx
+  stk: xxx
+  uid: xxx
+  ltkid: xxx
+  username: xxx
+  ltp0: xxx
   stick:
     remaining: 9999
 dingtalk:
-  token: qwe
-  secret: zxc
+  token: xxx
+  secret: xxx
 telegram:
-  token: okm
-  chat_id: 123
+  token: xxx
+  chat_id: xxx
 cron:
   refresh: "0 0 1 * * *"
   send_gift: "0 0 12 * * 0"
@@ -39,6 +44,8 @@ cron:
 
 ### Douyu
 
+#### Send Gift（通过 http 接口送免费礼物）
+
 | Name            | Type   | Require | Comment                             | Cookie                    |
 |-----------------|--------|---------|-------------------------------------|---------------------------|
 | did             | string | T       |                                     | dy_did (douyu.com)        |
@@ -46,6 +53,14 @@ cron:
 | auth            | string | T/F     | expire in 7 days                    | acf_auth (douyu.com)      |
 | ltp0            | string | T/F     | to refresh auth token               | LTP0 (passport.douyu.com) |
 | stick.remaining | int    | F       | room id to send remaining free gift |                           |
+
+#### Daily Refresh（通过 websocket 获取每日荧光棒）
+
+| Name     | Type   | Require | Comment | Cookie                   |
+|----------|--------|---------|---------|--------------------------|
+| stk      | string | T       |         | acf_stk (douyu.com)      |
+| ltkid    | string | T       |         | acf_ltkid (douyu.com)    |
+| username | string | T       |         | acf_username (douyu.com) |
 
 - `chrome://settings/cookies/detail?site=douyu.com`
 - `chrome://settings/cookies/detail?site=passport.douyu.com`

@@ -3,18 +3,21 @@ startup: false
 log:
   level: debug
 douyu:
-  did: abc
-  uid: 123
-  auth: xyz
-  ltp0: asd
+  room: 9999
+  did: xxx
+  stk: xxx
+  uid: xxx
+  ltkid: xxx
+  username: xxx
+  ltp0: xxx
   stick:
     remaining: 9999
 dingtalk:
-  token: qwe
-  secret: zxc
+  token: xxx
+  secret: xxx
 telegram:
-  token: okm
-  chat_id: 123
+  token: xxx
+  chat_id: xxx
 cron:
   refresh: "0 0 1 * * *"
   send_gift: "0 0 12 * * 0"

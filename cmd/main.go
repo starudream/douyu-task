@@ -10,13 +10,12 @@ import (
 )
 
 func init() {
-	config.SetDefault("cron.refresh", "0 0 1 * * *")
 	config.SetDefault("cron.send_gift", "0 0 12 * * 0")
 }
 
 func main() {
 	app.Add(startup)
-	app.Add(cron)
+	app.Add(cronjob)
 	err := app.Go()
 	if err != nil {
 		log.Fatal().Msgf("app init fail: %v", err)
@@ -25,18 +24,22 @@ func main() {
 
 func startup(context.Context) error {
 	if config.GetBool("startup") {
-		NewRenewal(false).Run()
+		NewRenewal().Run()
 	}
 	return nil
 }
 
-func cron(context.Context) error {
-	if _, err := cronx.AddJob(config.GetString("cron.refresh"), NewRenewal(true)); err != nil {
-		return err
+func cronjob(context.Context) error {
+	if cron := config.GetString("cron.refresh"); cron != "" {
+		if _, err := cronx.AddJob(cron, NewRefresh()); err != nil {
+			return err
+		}
 	}
 
-	if _, err := cronx.AddJob(config.GetString("cron.send_gift"), NewRenewal(false)); err != nil {
-		return err
+	if cron := config.GetString("cron.send_gift"); cron != "" {
+		if _, err := cronx.AddJob(cron, NewRenewal()); err != nil {
+			return err
+		}
 	}
 
 	go cronx.Run()

@@ -18,24 +18,21 @@ import (
 )
 
 // NewRenewal 送免费的荧光棒续牌子
-func NewRenewal(noSend bool) *Renewal {
+func NewRenewal() *Renewal {
 	r := &Renewal{
-		noSend: noSend,
-		did:    config.GetString("douyu.did"),
-		uid:    config.GetString("douyu.uid"),
-		auth:   config.GetString("douyu.auth"),
-		ltp0:   config.GetString("douyu.ltp0"),
+		did:  config.GetString("douyu.did"),
+		uid:  config.GetString("douyu.uid"),
+		auth: config.GetString("douyu.auth"),
+		ltp0: config.GetString("douyu.ltp0"),
 	}
 	if r.did == "" || r.uid == "" || (r.auth == "" && r.ltp0 == "") {
-		log.Fatal().Msgf("douyu missing config")
+		log.Fatal().Msgf("douyu renewal missing config")
 	}
 	r.stickRemaining = config.GetInt("douyu.stick.remaining")
 	return r
 }
 
 type Renewal struct {
-	noSend bool
-
 	did  string // cookie: dy_did
 	uid  string // cookie: acf_uid
 	auth string // cookie: acf_auth
@@ -47,34 +44,11 @@ type Renewal struct {
 var _ cronx.Job = (*Renewal)(nil)
 
 func (r *Renewal) Name() string {
-	if r.noSend {
-		return "renewal_no_end"
-	}
 	return "renewal"
 }
 
 func (r *Renewal) Run() {
-	c := api.New(r.did, r.uid, r.auth, r.ltp0)
-
-	if r.ltp0 != "" {
-		err := c.Refresh()
-		if err != nil {
-			log.Error().Msgf("refresh fail: %v", err)
-			_ = bot.Send("刷新认证失败：" + err.Error())
-			return
-		}
-	}
-
-	if r.noSend {
-		_, _, err := r.Badges(c, true)
-		if err != nil {
-			log.Error().Msgf("list badges fail: %v", err)
-			_ = bot.Send("获取牌子失败：" + err.Error())
-		}
-		return
-	}
-
-	err := r.Send(c)
+	err := r.Send()
 	if err != nil {
 		log.Error().Msgf("renewal: %v", err)
 		_ = bot.Send("续牌子失败：" + err.Error())
@@ -83,7 +57,16 @@ func (r *Renewal) Run() {
 	}
 }
 
-func (r *Renewal) Send(c *api.Client) error {
+func (r *Renewal) Send() error {
+	c := api.New(r.did, r.uid, r.auth, r.ltp0)
+
+	if r.ltp0 != "" {
+		err := c.Refresh()
+		if err != nil {
+			return fmt.Errorf("refresh fail: %v", err)
+		}
+	}
+
 	gifts, err := c.ListGifts()
 	if err != nil {
 		return fmt.Errorf("list gifts fail: %v", err)
