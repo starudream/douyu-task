@@ -29,6 +29,7 @@ func NewRenewal() *Renewal {
 		log.Fatal().Msgf("douyu renewal missing config")
 	}
 	r.stickRemaining = config.GetInt("douyu.stick.remaining")
+	r.client = api.New(r.did, r.uid, r.auth, r.ltp0)
 	return r
 }
 
@@ -39,6 +40,8 @@ type Renewal struct {
 	ltp0 string // cookie: ltp0
 
 	stickRemaining int // 房间号，剩余的荧光棒送给谁
+
+	client *api.Client
 }
 
 var _ cronx.Job = (*Renewal)(nil)
@@ -58,18 +61,9 @@ func (r *Renewal) Run() {
 }
 
 func (r *Renewal) Send() error {
-	c := api.New(r.did, r.uid, r.auth, r.ltp0)
-
-	if r.ltp0 != "" {
-		err := c.Refresh()
-		if err != nil {
-			return fmt.Errorf("refresh fail: %v", err)
-		}
-	}
-
-	gifts, err := c.ListGifts()
+	gifts, err := r.Gifts()
 	if err != nil {
-		return fmt.Errorf("list gifts fail: %v", err)
+		return err
 	}
 
 	id := gifts.NotEmpty(api.GiftFansGlowSticks, api.GiftGlowSticks)
@@ -77,7 +71,7 @@ func (r *Renewal) Send() error {
 		return fmt.Errorf("no free gift")
 	}
 
-	badges, _, err := r.Badges(c, true)
+	badges, _, err := r.Badges()
 	if err != nil {
 		return fmt.Errorf("list badges fail: %v", err)
 	}
@@ -88,7 +82,7 @@ func (r *Renewal) Send() error {
 		if badge.Room == r.stickRemaining {
 			continue
 		}
-		gifts, err = c.SendGift(badge.Room, id, 1)
+		gifts, err = r.client.SendGift(badge.Room, id, 1)
 		if err != nil {
 			log.Error().Msgf("send gift fail: %v", err)
 			continue
@@ -106,12 +100,12 @@ func (r *Renewal) Send() error {
 		return nil
 	}
 
-	gifts, err = c.SendGift(r.stickRemaining, id, stick)
+	gifts, err = r.client.SendGift(r.stickRemaining, id, stick)
 	if err != nil {
 		return fmt.Errorf("send gift fail: %v", err)
 	}
 
-	_, _, err = r.Badges(c, true)
+	_, _, err = r.Badges()
 	if err != nil {
 		return fmt.Errorf("list badges fail: %v", err)
 	}
@@ -119,8 +113,35 @@ func (r *Renewal) Send() error {
 	return nil
 }
 
-func (r *Renewal) Badges(c *api.Client, output bool) (map[int]*api.Badge, []int, error) {
-	badges, err := c.ListBadges()
+func (r *Renewal) Gifts() (*api.Gifts, error) {
+	if r.ltp0 != "" {
+		err := r.client.Refresh()
+		if err != nil {
+			return nil, fmt.Errorf("refresh fail: %v", err)
+		}
+	}
+
+	gifts, err := r.client.ListGifts()
+	if err != nil {
+		return nil, fmt.Errorf("list gifts fail: %v", err)
+	}
+
+	bb := &bytes.Buffer{}
+	tw := tablewriter.NewWriter(bb)
+	tw.SetAlignment(tablewriter.ALIGN_CENTER)
+	tw.SetHeader([]string{"name", "price", "count", "expire"})
+	for i := 0; i < len(gifts.List); i++ {
+		g := gifts.List[i]
+		tw.Append([]string{g.Name, strconv.Itoa(g.Price), strconv.Itoa(g.Count), time.Unix(int64(g.Met), 0).Format(time.DateTime)})
+	}
+	tw.Render()
+	log.Info().Msgf("gifts:\n%s", bb.String())
+
+	return gifts, nil
+}
+
+func (r *Renewal) Badges() (map[int]*api.Badge, []int, error) {
+	badges, err := r.client.ListBadges()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -134,18 +155,16 @@ func (r *Renewal) Badges(c *api.Client, output bool) (map[int]*api.Badge, []int,
 
 	sort.Slice(rs, func(i, j int) bool { return bm[rs[i]].Intimacy > bm[rs[j]].Intimacy })
 
-	if output {
-		bb := &bytes.Buffer{}
-		tw := tablewriter.NewWriter(bb)
-		tw.SetAlignment(tablewriter.ALIGN_CENTER)
-		tw.SetHeader([]string{"room", "anchor", "name", "level", "intimacy", "rank"})
-		for i := 0; i < len(rs); i++ {
-			b := bm[rs[i]]
-			tw.Append([]string{strconv.Itoa(b.Room), b.Anchor, b.Name, strconv.Itoa(b.Level), strconv.FormatFloat(b.Intimacy, 'f', -1, 64), strconv.Itoa(b.Rank)})
-		}
-		tw.Render()
-		log.Info().Msgf("badges:\n%s", bb.String())
+	bb := &bytes.Buffer{}
+	tw := tablewriter.NewWriter(bb)
+	tw.SetAlignment(tablewriter.ALIGN_CENTER)
+	tw.SetHeader([]string{"room", "anchor", "name", "level", "intimacy", "rank"})
+	for i := 0; i < len(rs); i++ {
+		b := bm[rs[i]]
+		tw.Append([]string{strconv.Itoa(b.Room), b.Anchor, b.Name, strconv.Itoa(b.Level), strconv.FormatFloat(b.Intimacy, 'f', -1, 64), strconv.Itoa(b.Rank)})
 	}
+	tw.Render()
+	log.Info().Msgf("badges:\n%s", bb.String())
 
 	return bm, rs, nil
 }

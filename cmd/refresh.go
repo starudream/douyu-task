@@ -25,9 +25,9 @@ func NewRefresh() *Refresh {
 
 type Refresh struct {
 	room     int
-	stk      string
-	ltkid    string
-	username string
+	stk      string // cookie: acf_stk
+	ltkid    string // cookie: acf_ltkid
+	username string // cookie: acf_username
 }
 
 var _ cronx.Job = (*Refresh)(nil)
@@ -37,6 +37,7 @@ func (r *Refresh) Name() string {
 }
 
 func (r *Refresh) Run() {
+	_, _ = NewRenewal().Gifts()
 	err := ws.Login(ws.LoginParams{
 		Room:     r.room,
 		Stk:      r.stk,
@@ -49,4 +50,5 @@ func (r *Refresh) Run() {
 	} else {
 		_ = bot.Send("刷新背包成功")
 	}
+	_, _ = NewRenewal().Gifts()
 }
