@@ -56,8 +56,9 @@ func Login(p LoginParams) error {
 
 	go client.listen()
 
-	if !client.login(p) {
-		return fmt.Errorf("login fail, please check your log file")
+	err = client.login(p)
+	if err != nil {
+		return fmt.Errorf("login error: %s", err)
 	}
 
 	time.Sleep(time.Second)
@@ -65,7 +66,7 @@ func Login(p LoginParams) error {
 	return nil
 }
 
-func (c *Client) login(p LoginParams) (t bool) {
+func (c *Client) login(p LoginParams) error {
 	devId := seq.UUIDShort()
 	rt := strconv.FormatInt(time.Now().Unix(), 10)
 	vk := md5Hex(rt + loginRandom + devId)
@@ -82,13 +83,17 @@ func (c *Client) login(p LoginParams) (t bool) {
 		select {
 		case msg := <-c.msg:
 			if v, ok := msg["type"]; ok && v == "loginres" {
-				log.Info().Msgf("[websocket] login success: %s", json.MustMarshal(msg))
-				return true
+				if msg["username"] == p.Username {
+					log.Info().Msgf("[websocket] login success: %s", json.MustMarshal(msg))
+					return nil
+				} else {
+					return fmt.Errorf("secret keys maybe expired")
+				}
 			}
 		case <-c.done:
-			return
+			return fmt.Errorf("connection closed")
 		case <-time.After(loginTimeout):
-			return
+			return fmt.Errorf("timeout")
 		}
 	}
 }
