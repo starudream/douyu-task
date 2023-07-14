@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/starudream/go-lib v1.13.3
+	github.com/starudream/go-lib v1.13.4
 	golang.org/x/net v0.12.0
 )
 
