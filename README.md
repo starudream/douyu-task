@@ -1,7 +1,7 @@
 # Douyu-Task
 
 ![Golang](https://img.shields.io/github/actions/workflow/status/starudream/douyu-task/golang.yml?label=golang&style=for-the-badge)
-![Docker](https://img.shields.io/github/actions/workflow/status/starudream/douyu-task/docker.yml?label=docker&style=for-the-badge)
+![Release](https://img.shields.io/github/actions/workflow/status/starudream/douyu-task/release.yml?label=release&style=for-the-badge)
 ![Release](https://img.shields.io/github/v/release/starudream/douyu-task?include_prereleases&sort=semver&style=for-the-badge)
 ![License](https://img.shields.io/github/license/starudream/douyu-task?style=for-the-badge)
 
