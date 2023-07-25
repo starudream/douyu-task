@@ -4,13 +4,22 @@ import (
 	"testing"
 
 	"github.com/starudream/go-lib/config"
+
+	"github.com/starudream/douyu-task/api"
 )
 
 func TestLogin(t *testing.T) {
-	t.Log(Login(LoginParams{
+	client, err := api.NewFromEnv()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Login(LoginParams{
 		Room:     config.GetInt("douyu.room"),
-		Stk:      config.GetString("douyu.stk"),
-		Ltkid:    config.GetString("douyu.ltkid"),
-		Username: config.GetString("douyu.username"),
-	}))
+		Stk:      client.Stk,
+		Ltkid:    client.Ltkid,
+		Username: client.Username,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }

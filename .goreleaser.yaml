@@ -25,7 +25,7 @@ builds:
       - -s -w
       - -X "github.com/starudream/go-lib/constant.VERSION=v{{ .Version }}"
       - -X "github.com/starudream/go-lib/constant.BIDTIME={{ .Date }}"
-      - -X "github.com/starudream/go-lib/constant.NAME="
+      - -X "github.com/starudream/go-lib/constant.NAME=douyu-task"
       - -X "github.com/starudream/go-lib/constant.PREFIX="
 
 upx:

@@ -11,14 +11,15 @@ import (
 	"github.com/starudream/go-lib/codec/json"
 	"github.com/starudream/go-lib/log"
 	"github.com/starudream/go-lib/seq"
+
+	"github.com/starudream/douyu-task/consts"
+	"github.com/starudream/douyu-task/internal/cryptox"
 )
 
 const (
-	URL = "wss://wsproxy.douyu.com:6675"
-
-	RoomYYF = 9999
-
-	loginRandom = "r5*^5;}2#${XF[h+;'./.Q'1;,-]f'p["
+	// URL websocket url
+	// https://www.douyu.com/lapi/live/gateway/web/9999?isH5=1
+	URL = "wss://wsproxy.douyu.com:6671"
 
 	loginTimeout = 10 * time.Second
 )
@@ -39,7 +40,7 @@ type LoginParams struct {
 
 func Login(p LoginParams) error {
 	if p.Room <= 0 {
-		p.Room = RoomYYF
+		p.Room = consts.RoomYYF
 	}
 
 	conn, _, err := websocket.DefaultDialer.Dial(URL, nil)
@@ -58,7 +59,7 @@ func Login(p LoginParams) error {
 
 	err = client.login(p)
 	if err != nil {
-		return fmt.Errorf("login error: %s", err)
+		return fmt.Errorf("login error: %w", err)
 	}
 
 	time.Sleep(time.Second)
@@ -69,7 +70,7 @@ func Login(p LoginParams) error {
 func (c *Client) login(p LoginParams) error {
 	devId := seq.UUIDShort()
 	rt := strconv.FormatInt(time.Now().Unix(), 10)
-	vk := md5Hex(rt + loginRandom + devId)
+	vk := cryptox.MD5Hex(rt + consts.WSLoginHash + devId)
 
 	c.write(
 		"type", "loginreq",
@@ -102,13 +103,17 @@ func (c *Client) write(kv ...string) {
 	if c.conn == nil {
 		return
 	}
+	msg := map[string]string{}
+	for i := 0; i < len(kv); i += 2 {
+		msg[kv[i]] = kv[i+1]
+	}
 	c.wMu.Lock()
 	defer c.wMu.Unlock()
 	err := c.conn.WriteMessage(websocket.BinaryMessage, Encode(kv...))
 	if err != nil {
 		log.Debug().Msgf("[websocket] write message error: %s", err)
 	} else {
-		log.Debug().Msgf("[websocket] write message: %#v", kv)
+		log.Debug().Msgf("[websocket] write message: %s", json.MustMarshal(msg))
 	}
 }
 

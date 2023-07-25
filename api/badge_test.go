@@ -8,5 +8,5 @@ import (
 
 func TestClient_ListBadges(t *testing.T) {
 	resp, err := client.ListBadges()
-	testx.P(t, err, resp)
+	testx.P(t, err, resp.TableString())
 }

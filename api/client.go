@@ -1,57 +1,54 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
+
+	"github.com/starudream/go-lib/config"
+	"github.com/starudream/go-lib/httpx"
+
+	"github.com/starudream/douyu-task/consts"
 )
 
 const URL = "https://www.douyu.com"
 
+func init() {
+	config.SetDefault("douyu.ua", consts.UserAgent)
+
+	httpx.SetUserAgent(config.GetString("douyu.ua"))
+}
+
 type Client struct {
-	did  string // cookie: dy_did
-	uid  string // cookie: acf_uid
-	auth string // cookie: acf_auth
-	ltp0 string // cookie: ltp0
+	Did  string // cookie: dy_did
+	Ltp0 string // cookie: ltp0
+
+	Uid      string // cookie: acf_uid
+	Auth     string // cookie: acf_auth
+	Stk      string // cookie: acf_stk
+	Ltkid    string // cookie: acf_ltkid
+	Username string // cookie: acf_username
 }
 
-func New(did, uid, auth, ltp0 string) *Client {
-	return &Client{
-		did:  did,
-		uid:  uid,
-		auth: auth,
-		ltp0: ltp0,
+func New(did, ltp0 string) (*Client, error) {
+	c := &Client{
+		Did:  did,
+		Ltp0: ltp0,
 	}
+	if c.Did == "" || c.Ltp0 == "" {
+		return nil, fmt.Errorf("missing config")
+	}
+	return c, c.Refresh()
 }
 
-func NewWithCookie(cookie string) *Client {
-	client := &Client{}
-	ss := strings.Split(cookie, ";")
-	for _, s := range ss {
-		kvs := strings.Split(s, "=")
-		if len(kvs) != 2 {
-			continue
-		}
-		k, v := strings.TrimSpace(kvs[0]), strings.TrimSpace(kvs[1])
-		switch k {
-		case "dy_did":
-			client.did = v
-		case "acf_auth":
-			client.auth = v
-		case "acf_uid":
-			client.uid = v
-		}
-	}
-	if client.did == "" || client.uid == "" || client.auth == "" {
-		return nil
-	}
-	return client
+func NewFromEnv() (*Client, error) {
+	return New(config.GetString("douyu.did"), config.GetString("douyu.ltp0"))
 }
 
 func (c *Client) genAuthCookies() []*http.Cookie {
 	return []*http.Cookie{
-		{Name: "dy_did", Value: c.did},
-		{Name: "acf_uid", Value: c.uid},
-		{Name: "acf_auth", Value: c.auth},
+		{Name: "dy_did", Value: c.Did},
+		{Name: "acf_uid", Value: c.Uid},
+		{Name: "acf_auth", Value: c.Auth},
 	}
 }
 

@@ -1,23 +1,41 @@
+# 调试模式，打印更多日志
 debug: false
-startup: false
-log:
-  level: debug
+
+# 计划任务
+cron:
+  # 刷新背包荧光棒
+  refresh: "0 0 1 * * *"
+  # 送免费的荧光棒续牌子
+  renewal: "0 0 12 * * 0"
+
+# 基本配置
 douyu:
-  room: 9999
+  # 必填，cookie: dy_did
   did: xxx
-  stk: xxx
-  uid: xxx
-  ltkid: xxx
-  username: xxx
+  # 必填，cookie: ltp0
   ltp0: xxx
-  stick:
-    remaining: 9999
+
+  # 每日登录直播间号
+  room: 9999
+
+  # 荧光棒分配
+  assigns:
+    # { room, count, all }
+    # room 直播间号，如果是 0 的话，对已有牌子的直播间分别送上 count 数量的荧光棒
+    # count 荧光棒数量
+    # all 是否全部分配，建议最后一个直播间设置为 all: true，这样就可以把剩余的荧光棒全部分配出去
+    - count: 1
+    - room: 99999
+      count: 10
+    - room: 9999
+      all: true
+
+# 钉钉机器人通知
 dingtalk:
   token: xxx
   secret: xxx
+
+# Telegram 机器人通知
 telegram:
   token: xxx
   chat_id: xxx
-cron:
-  refresh: "0 0 1 * * *"
-  send_gift: "0 0 12 * * 0"

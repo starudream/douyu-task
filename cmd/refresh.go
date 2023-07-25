@@ -1,33 +1,27 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/starudream/go-lib/bot"
 	"github.com/starudream/go-lib/config"
 	"github.com/starudream/go-lib/cronx"
 	"github.com/starudream/go-lib/log"
 
+	"github.com/starudream/douyu-task/api"
 	"github.com/starudream/douyu-task/ws"
 )
 
 // NewRefresh 刷新背包荧光棒
 func NewRefresh() *Refresh {
 	r := &Refresh{
-		room:     config.GetInt("douyu.room"),
-		stk:      config.GetString("douyu.stk"),
-		ltkid:    config.GetString("douyu.ltkid"),
-		username: config.GetString("douyu.username"),
-	}
-	if r.stk == "" || r.ltkid == "" || r.username == "" {
-		log.Fatal().Msgf("douyu refresh missing config")
+		room: config.GetInt("douyu.room"),
 	}
 	return r
 }
 
 type Refresh struct {
-	room     int
-	stk      string // cookie: acf_stk
-	ltkid    string // cookie: acf_ltkid
-	username string // cookie: acf_username
+	room int
 }
 
 var _ cronx.Job = (*Refresh)(nil)
@@ -37,18 +31,42 @@ func (r *Refresh) Name() string {
 }
 
 func (r *Refresh) Run() {
-	_, _ = NewRenewal().Gifts()
-	err := ws.Login(ws.LoginParams{
+	err := r.do()
+	if err != nil {
+		log.Error().Msgf("refresh error: %v", err)
+		_ = bot.Send("刷新礼物失败：" + err.Error())
+	} else {
+		_ = bot.Send("刷新礼物成功")
+	}
+}
+
+func (r *Refresh) do() error {
+	client, err := api.NewFromEnv()
+	if err != nil {
+		return fmt.Errorf("init api error: %w", err)
+	}
+
+	gifts1, err := client.ListGifts()
+	if err != nil {
+		return fmt.Errorf("list gifts error: %w", err)
+	}
+	log.Info().Msgf("gifts before:\n%s", gifts1.TableString())
+
+	err = ws.Login(ws.LoginParams{
 		Room:     r.room,
-		Stk:      r.stk,
-		Ltkid:    r.ltkid,
-		Username: r.username,
+		Stk:      client.Stk,
+		Ltkid:    client.Ltkid,
+		Username: client.Username,
 	})
 	if err != nil {
-		log.Error().Msgf("refresh: %v", err)
-		_ = bot.Send("刷新背包失败：" + err.Error())
-	} else {
-		_ = bot.Send("刷新背包成功")
+		return fmt.Errorf("login error: %w", err)
 	}
-	_, _ = NewRenewal().Gifts()
+
+	gifts2, err := client.ListGifts()
+	if err != nil {
+		return fmt.Errorf("list gifts error: %w", err)
+	}
+	log.Info().Msgf("gifts after:\n%s", gifts2.TableString())
+
+	return nil
 }

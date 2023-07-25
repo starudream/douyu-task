@@ -4,14 +4,32 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/starudream/go-lib/httpx"
 
 	"github.com/starudream/douyu-task/internal/htmlx"
 )
+
+type Badges []*Badge
+
+func (bs *Badges) TableString() string {
+	bb := &bytes.Buffer{}
+	tw := tablewriter.NewWriter(bb)
+	tw.SetAlignment(tablewriter.ALIGN_CENTER)
+	tw.SetHeader([]string{"room", "anchor", "name", "level", "intimacy", "rank"})
+	for i := 0; i < len(*bs); i++ {
+		b := (*bs)[i]
+		tw.Append([]string{strconv.Itoa(b.Room), b.Anchor, b.Name, strconv.Itoa(b.Level), strconv.FormatFloat(b.Intimacy, 'f', -1, 64), strconv.Itoa(b.Rank)})
+	}
+	tw.Render()
+	return bb.String()
+}
 
 // Badge 徽章
 type Badge struct {
@@ -24,7 +42,7 @@ type Badge struct {
 	AccessAt time.Time // 获得时间
 }
 
-func (c *Client) ListBadges() ([]*Badge, error) {
+func (c *Client) ListBadges() (Badges, error) {
 	resp, err := httpx.R().
 		SetCookies(c.genAuthCookies()).
 		SetHeader("referer", URL).
@@ -91,6 +109,8 @@ func (c *Client) ListBadges() ([]*Badge, error) {
 		badge.Name = htmlx.NodeAttrSearch(tr, func(attr htmlx.Attribute) bool { return attr.Key == "data-bn" })
 		badges[i] = badge
 	}
+
+	sort.Slice(badges, func(i, j int) bool { return badges[i].Intimacy > badges[j].Intimacy })
 
 	return badges, nil
 }

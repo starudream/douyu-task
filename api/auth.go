@@ -11,8 +11,8 @@ import (
 
 func (c *Client) Refresh() error {
 	resp, err := httpx.R().
-		SetCookie(&http.Cookie{Name: "dy_did", Value: c.did}).
-		SetCookie(&http.Cookie{Name: "LTP0", Value: c.ltp0}).
+		SetCookie(&http.Cookie{Name: "dy_did", Value: c.Did}).
+		SetCookie(&http.Cookie{Name: "LTP0", Value: c.Ltp0}).
 		SetHeader("referer", URL).
 		SetQueryParam("client_id", "1").
 		SetQueryParam("t", strconv.Itoa(int(time.Now().UnixMilli()))).
@@ -28,10 +28,25 @@ func (c *Client) Refresh() error {
 	}
 
 	for _, cookie := range resp.Cookies() {
-		if cookie.Name == "acf_auth" {
-			c.auth = cookie.Value
-			return nil
+		if cookie.Name == "acf_uid" {
+			c.Uid = cookie.Value
 		}
+		if cookie.Name == "acf_auth" {
+			c.Auth = cookie.Value
+		}
+		if cookie.Name == "acf_stk" {
+			c.Stk = cookie.Value
+		}
+		if cookie.Name == "acf_ltkid" {
+			c.Ltkid = cookie.Value
+		}
+		if cookie.Name == "acf_username" {
+			c.Username = cookie.Value
+		}
+	}
+
+	if c.Uid != "" && c.Auth != "" && c.Stk != "" && c.Ltkid != "" && c.Username != "" {
+		return nil
 	}
 
 	return fmt.Errorf("cookies not found")

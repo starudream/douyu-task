@@ -1,15 +1,34 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/starudream/go-lib/httpx"
+
+	"github.com/starudream/douyu-task/consts"
 )
 
 type Gifts struct {
 	List []*Gift `json:"list"`
+}
+
+func (gs *Gifts) TableString() string {
+	bb := &bytes.Buffer{}
+	tw := tablewriter.NewWriter(bb)
+	tw.SetAlignment(tablewriter.ALIGN_CENTER)
+	tw.SetHeader([]string{"name", "price", "count", "expire"})
+	for i := 0; i < len(gs.List); i++ {
+		g := gs.List[i]
+		tw.Append([]string{g.Name, strconv.Itoa(g.Price), strconv.Itoa(g.Count), time.Unix(int64(g.Met), 0).Format(time.DateTime)})
+	}
+	tw.Render()
+	return bb.String()
 }
 
 func (gs *Gifts) Find(id int) *Gift {
@@ -51,13 +70,6 @@ func (gift *Gift) GetCount() int {
 	return gift.Count
 }
 
-const (
-	// GiftGlowSticks 粉丝荧光棒
-	GiftGlowSticks = 268
-	// GiftFansGlowSticks 钻粉粉丝荧光棒
-	GiftFansGlowSticks = 2358
-)
-
 type SendGiftResp struct {
 	CommonResp
 	Data *Gifts `json:"data"`
@@ -96,8 +108,6 @@ func (c *Client) SendGift(room, gift, count int) (*Gifts, error) {
 	return res.Data, nil
 }
 
-const RoomYYF = 9999
-
 type ListGiftResp struct {
 	CommonResp
 	Data *Gifts `json:"data"`
@@ -108,7 +118,7 @@ func (c *Client) ListGifts(rooms ...int) (*Gifts, error) {
 		if len(rooms) > 0 && rooms[0] != 0 {
 			return rooms[0]
 		}
-		return RoomYYF
+		return consts.RoomYYF
 	}()
 
 	resp, err := httpx.R().
