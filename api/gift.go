@@ -70,6 +70,15 @@ func (gift *Gift) GetCount() int {
 	return gift.Count
 }
 
+func (gift *Gift) TodayExpired() bool {
+	if gift == nil {
+		return false
+	}
+	y, m, d := time.Now().Date()
+	t := time.Date(y, m, d+1, 0, 0, 0, 0, time.Local)
+	return t.Unix() == int64(gift.Met)
+}
+
 type SendGiftResp struct {
 	CommonResp
 	Data *Gifts `json:"data"`

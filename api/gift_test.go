@@ -17,3 +17,8 @@ func TestClient_ListGift(t *testing.T) {
 	resp, err := client.ListGifts()
 	testx.P(t, err, resp.TableString())
 }
+
+func TestGift_TodayExpired(t *testing.T) {
+	resp, err := client.ListGifts()
+	testx.P(t, err, resp.TableString(), resp.Find(consts.GiftGlowSticks).TodayExpired())
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/starudream/go-lib/bot"
@@ -46,12 +47,18 @@ func (r *Renewal) Name() string {
 func (r *Renewal) Run() {
 	err := r.do()
 	if err != nil {
-		log.Error().Msgf("renewal error: %v", err)
-		_ = bot.Send("续牌子失败：" + err.Error())
+		if errors.Is(err, ErrTodayNotExpired) {
+			log.Info().Msgf("renewal gifts today not expired, skip")
+		} else {
+			log.Error().Msgf("renewal error: %v", err)
+			_ = bot.Send("续牌子失败：" + err.Error())
+		}
 	} else {
 		_ = bot.Send("续牌子成功")
 	}
 }
+
+var ErrTodayNotExpired = errors.New("today no expired")
 
 func (r *Renewal) do() error {
 	client, err := api.NewFromEnv()
@@ -76,7 +83,13 @@ func (r *Renewal) do() error {
 		return fmt.Errorf("no free gift")
 	}
 
-	count := gifts1.Find(id).GetCount()
+	gift := gifts1.Find(id)
+
+	if !gift.TodayExpired() {
+		return ErrTodayNotExpired
+	}
+
+	count := gift.GetCount()
 
 	for i := 0; i < len(r.assigns); i++ {
 		a := r.assigns[i]
