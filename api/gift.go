@@ -76,7 +76,7 @@ func (gift *Gift) TodayExpired() bool {
 	}
 	y, m, d := time.Now().Date()
 	t := time.Date(y, m, d+1, 0, 0, 0, 0, time.Local)
-	return t.Unix() == int64(gift.Met)
+	return t.Unix() >= int64(gift.Met)
 }
 
 type SendGiftResp struct {
