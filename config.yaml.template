@@ -12,7 +12,7 @@ cron:
 douyu:
   # 必填，cookie: dy_did
   did: xxx
-  # 必填，cookie: ltp0
+  # 必填，cookie: ltp0，建议使用无痕模式获取，不影响其他登录状态（issues#28）
   ltp0: xxx
 
   # 每日登录直播间号
