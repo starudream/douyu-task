@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/cenkalti/backoff/v4"
 
 	"github.com/starudream/go-lib/bot"
 	"github.com/starudream/go-lib/config"
@@ -31,7 +34,19 @@ func (r *Refresh) Name() string {
 }
 
 func (r *Refresh) Run() {
-	err := r.do()
+	err := backoff.Retry(r.do, func() backoff.BackOff {
+		b := &backoff.ExponentialBackOff{
+			InitialInterval:     10 * time.Second,
+			RandomizationFactor: 0.5,
+			Multiplier:          1.5,
+			MaxInterval:         30 * time.Second,
+			MaxElapsedTime:      10 * time.Minute,
+			Stop:                backoff.Stop,
+			Clock:               backoff.SystemClock,
+		}
+		b.Reset()
+		return b
+	}())
 	if err != nil {
 		log.Error().Msgf("refresh error: %v", err)
 		_ = bot.Send("刷新礼物失败：" + err.Error())
