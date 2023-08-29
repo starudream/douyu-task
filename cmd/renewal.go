@@ -85,13 +85,10 @@ func (r *Renewal) do() error {
 
 	gift := gifts1.Find(id)
 
-	
-	if withOutTimeCheck := config.GetBool("withOutTimeCheck"); withOutTimeCheck == true {
+	if config.GetBool("withOutTimeCheck") {
 		log.Info().Msgf("direct send gifts without check expired or not")
-	} else {
-		if !gift.TodayExpired() {
-			return ErrTodayNotExpired
-		}
+	} else if !gift.TodayExpired() {
+		return ErrTodayNotExpired
 	}
 
 	count := gift.GetCount()
