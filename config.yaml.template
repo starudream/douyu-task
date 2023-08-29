@@ -1,5 +1,7 @@
 # 调试模式，打印更多日志
 debug: false
+# 无视过期时间, 直接送, 默认关闭
+withOutTimeCheck: false
 
 # 计划任务
 cron:
