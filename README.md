@@ -118,11 +118,6 @@ services:
       app.log.file.enabled: "true"
       app.log.file.level: "debug"
       app.log.file.filename: "/douyu/app.log"
-      app.cron.refresh: "0 10 0 * * *"
-      app.cron.renewal: "0 50 23 * * *"
-      app.douyu.did: "foo"
-      app.douyu.ltp0: "foo"
-      app.douyu.room: "9999"
 ```
 
 ## [License](./LICENSE)

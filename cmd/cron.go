@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/starudream/go-lib/cobra/v2"
@@ -55,6 +56,9 @@ func cronRenewal() {
 	msg := "斗鱼送礼物续粉丝牌"
 	err := job.Renewal()
 	if err != nil {
+		if errors.Is(err, job.ErrTodayNotExpired) {
+			return
+		}
 		msg += fmt.Sprintf("失败：%v", err)
 		slog.Error(msg)
 	} else {
