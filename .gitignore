@@ -1,9 +1,15 @@
-# Jetbrains
-.idea/
+# IntelliJ project files
+/.idea
+/*.iml
 
-# Dist
-bin/
-dist/
+# Compiled files
+/bin
+/dist
+/log
+/cover
+*.exe
+*.log
 
-# Config
-config.yaml
+# Dev files
+douyu-task*.yaml
+!douyu-task.example.yaml

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/starudream/go-lib/testx"
+	"github.com/starudream/go-lib/core/v2/utils/testutil"
 )
 
 var raw = `
@@ -69,5 +69,5 @@ func TestNodeSearch(t *testing.T) {
 }
 
 func TestNodeTitle(t *testing.T) {
-	testx.RequireEqualf(t, "TEST", NodeTitle(root), "NodeTitle")
+	testutil.MustEqual(t, "TEST", NodeTitle(root))
 }

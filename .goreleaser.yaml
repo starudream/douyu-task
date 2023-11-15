@@ -1,9 +1,6 @@
 env:
+  - CGO_ENABLED=0
   - GO111MODULE=on
-
-before:
-  hooks:
-    - go mod tidy
 
 snapshot:
   name_template: "{{ .Version }}-next"
@@ -12,8 +9,6 @@ report_sizes: true
 
 builds:
   - main: ./cmd
-    env:
-      - CGO_ENABLED=0
     goos:
       - linux
       - darwin
@@ -23,10 +18,7 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X "github.com/starudream/go-lib/constant.VERSION=v{{ .Version }}"
-      - -X "github.com/starudream/go-lib/constant.BIDTIME={{ .Date }}"
-      - -X "github.com/starudream/go-lib/constant.NAME=douyu-task"
-      - -X "github.com/starudream/go-lib/constant.PREFIX="
+      - -X "github.com/starudream/go-lib/core/v2/config/version.gitVersion=v{{ .Version }}"
 
 archives:
   - format: tar.gz
@@ -97,8 +89,6 @@ checksum:
   name_template: "checksums.txt"
 
 release:
-  draft: true
-  replace_existing_draft: true
   target_commitish: "{{ .Commit }}"
 
 changelog:

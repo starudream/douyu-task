@@ -4,21 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/starudream/go-lib/config"
-	"github.com/starudream/go-lib/httpx"
+	"github.com/starudream/go-lib/core/v2/utils/osutil"
+	"github.com/starudream/go-lib/resty/v2"
 
-	"github.com/starudream/douyu-task/consts"
+	"github.com/starudream/douyu-task/config"
 )
 
 const URL = "https://www.douyu.com"
 
-func init() {
-	config.SetDefault("douyu.ua", consts.UserAgent)
-
-	httpx.SetUserAgent(config.GetString("douyu.ua"))
-}
-
 type Client struct {
+	c *resty.Client
+
 	Did  string // cookie: dy_did
 	Ltp0 string // cookie: ltp0
 
@@ -40,8 +36,21 @@ func New(did, ltp0 string) (*Client, error) {
 	return c, c.Refresh()
 }
 
-func NewFromEnv() (*Client, error) {
-	return New(config.GetString("douyu.did"), config.GetString("douyu.ltp0"))
+func NewC(douyu config.Douyu) (*Client, error) {
+	return New(douyu.Did, douyu.Ltp0)
+}
+
+func MustNew(douyu config.Douyu) *Client {
+	c, err := NewC(douyu)
+	osutil.PanicErr(err)
+	return c
+}
+
+func (c *Client) R() *resty.Request {
+	if c.c == nil {
+		c.c = resty.New().SetHeader(resty.HeaderUserAgent, resty.UAWindowsChrome)
+	}
+	return c.c.R()
 }
 
 func (c *Client) genAuthCookies() []*http.Cookie {

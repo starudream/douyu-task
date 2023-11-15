@@ -9,26 +9,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olekukonko/tablewriter"
-
-	"github.com/starudream/go-lib/httpx"
+	"github.com/starudream/go-lib/tablew/v2"
 
 	"github.com/starudream/douyu-task/internal/htmlx"
 )
 
 type Badges []*Badge
 
-func (bs *Badges) TableString() string {
-	bb := &bytes.Buffer{}
-	tw := tablewriter.NewWriter(bb)
-	tw.SetAlignment(tablewriter.ALIGN_CENTER)
-	tw.SetHeader([]string{"room", "anchor", "name", "level", "intimacy", "rank"})
-	for i := 0; i < len(*bs); i++ {
-		b := (*bs)[i]
-		tw.Append([]string{strconv.Itoa(b.Room), b.Anchor, b.Name, strconv.Itoa(b.Level), strconv.FormatFloat(b.Intimacy, 'f', -1, 64), strconv.Itoa(b.Rank)})
-	}
-	tw.Render()
-	return bb.String()
+func (bs Badges) TableString() string {
+	return tablew.Structs(bs)
 }
 
 // Badge 徽章
@@ -43,7 +32,7 @@ type Badge struct {
 }
 
 func (c *Client) ListBadges() (Badges, error) {
-	resp, err := httpx.R().
+	resp, err := c.R().
 		SetCookies(c.genAuthCookies()).
 		SetHeader("referer", URL).
 		Get(URL + "/member/cp/getFansBadgeList")

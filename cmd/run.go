@@ -5,113 +5,146 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/starudream/go-lib/config"
-	"github.com/starudream/go-lib/flag"
+	"github.com/starudream/go-lib/cobra/v2"
+	"github.com/starudream/go-lib/core/v2/utils/fmtutil"
+	"github.com/starudream/go-lib/core/v2/utils/sliceutil"
 
 	"github.com/starudream/douyu-task/api"
+	"github.com/starudream/douyu-task/config"
 	"github.com/starudream/douyu-task/consts"
-	"github.com/starudream/douyu-task/internal/osx"
+	"github.com/starudream/douyu-task/job"
 )
 
-var runCmd = &flag.Command{
-	Use:   "run",
-	Short: "just run once for test/debug",
-}
+var (
+	runCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "run"
+		c.Short = "Run douyu job manually"
+	})
 
-var runLoginCmd = &flag.Command{
-	Use:   "login",
-	Short: "login douyu through websocket to get glow sticks",
-	Run: func(cmd *flag.Command, args []string) {
-		osx.PE(NewRefresh().do())
-	},
-}
-
-var runGiftCmd = &flag.Command{
-	Use:   "gift",
-	Short: "douyu gift",
-}
-
-var runGiftListCmd = &flag.Command{
-	Use:     "list",
-	Aliases: []string{"ls"},
-	Short:   "list gift you have",
-	Run: func(cmd *flag.Command, args []string) {
-		c, e := api.NewFromEnv()
-		osx.PE(e)
-		gs, e := c.ListGifts(config.GetInt("douyu.room"))
-		osx.PE(e)
-		osx.PA(gs.TableString())
-	},
-}
-
-var runGiftSendCmd = &flag.Command{
-	Use:   "send",
-	Short: "send gift you have",
-	Args:  flag.ExactArgs(1),
-	Run: func(cmd *flag.Command, args []string) {
-		count, e := strconv.Atoi(args[0])
-		osx.PE(e)
-
-		c, e := api.NewFromEnv()
-		osx.PE(e)
-
-		bs1, e := c.ListBadges()
-		osx.PE(e, bs1.TableString())
-
-		gs1, e := c.ListGifts(config.GetInt("douyu.room"))
-		osx.PE(e, gs1.TableString())
-
-		fmt.Printf("send gift(%d) count(%d) to room(%d), please confirm(y/n): ", config.GetInt("douyu.gift"), count, config.GetInt("douyu.room"))
-
-		var s string
-		_, e = fmt.Scanf("%s", &s)
-		osx.PE(e)
-		if xx := strings.ToLower(s); xx != "y" && xx != "yes" {
-			osx.PA("abort")
+	runRefreshCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "refresh"
+		c.Short = "Simulate login to Douyu and get free gifts"
+		c.RunE = func(cmd *cobra.Command, args []string) error {
+			return job.Refresh()
 		}
+	})
 
-		_, e = c.SendGift(config.GetInt("douyu.room"), config.GetInt("douyu.gift"), count)
-		osx.PE(e)
+	runGiftCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "gift"
+		c.Short = "Manage your gifts"
+	})
 
-		gs2, e := c.ListGifts(config.GetInt("douyu.room"))
-		osx.PE(e, gs2.TableString())
+	runGiftListCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "list"
+		c.Short = "List your gifts"
+		c.Aliases = []string{"ls"}
+		c.RunE = func(cmd *cobra.Command, args []string) error {
+			client, err := api.NewC(config.C().Douyu)
+			if err != nil {
+				return fmt.Errorf("new client error: %w", err)
+			}
+			gifts, err := client.ListGifts()
+			if err != nil {
+				return fmt.Errorf("list gifts error: %w", err)
+			}
+			fmt.Println(gifts.TableString())
+			return nil
+		}
+	})
 
-		bs2, e := c.ListBadges()
-		osx.PE(e, bs2.TableString())
-	},
-}
+	runGiftSendCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "send <room id> <gift id> <count>"
+		c.Short = "Send gift to room"
+		c.RunE = func(cmd *cobra.Command, args []string) error {
+			var (
+				roomId = atoi(args, 0, strconv.Itoa(consts.RoomYYF))
+				giftId = atoi(args, 1, strconv.Itoa(consts.GiftGlowSticks))
+				count  = atoi(args, 2, "1")
+			)
 
-var runBadgeCmd = &flag.Command{
-	Use:   "badge",
-	Short: "douyu badge",
-}
+			client, err := api.NewC(config.C().Douyu)
+			if err != nil {
+				return fmt.Errorf("new client error: %w", err)
+			}
 
-var runBadgeListCmd = &flag.Command{
-	Use:     "list",
-	Aliases: []string{"ls"},
-	Short:   "list badge you have",
-	Run: func(cmd *flag.Command, args []string) {
-		c, e := api.NewFromEnv()
-		osx.PE(e)
-		bs, e := c.ListBadges()
-		osx.PE(e)
-		osx.PA(bs.TableString())
-	},
-}
+			badges, err := client.ListBadges()
+			if err != nil {
+				return fmt.Errorf("list badges error: %w", err)
+			}
+			fmt.Println(badges.TableString())
+
+			gifts, err := client.ListGifts()
+			if err != nil {
+				return fmt.Errorf("list gifts error: %w", err)
+			}
+			fmt.Println(gifts.TableString())
+
+			confirm := fmtutil.Scan(fmt.Sprintf("send gift to room id %d, gift id %d, count %d, confirm? (y/n)", roomId, giftId, count))
+			if s := strings.ToLower(strings.TrimSpace(confirm)); s != "y" && s != "yes" {
+				fmt.Println("canceled")
+				return nil
+			}
+
+			_, err = client.SendGift(roomId, giftId, count)
+			if err != nil {
+				return fmt.Errorf("send gift error: %w", err)
+			}
+
+			gifts, err = client.ListGifts()
+			if err != nil {
+				return fmt.Errorf("list gifts error: %w", err)
+			}
+			fmt.Println(gifts.TableString())
+
+			badges, err = client.ListBadges()
+			if err != nil {
+				return fmt.Errorf("list badges error: %w", err)
+			}
+			fmt.Println(badges.TableString())
+
+			return nil
+		}
+	})
+
+	runBadgeCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "badge"
+		c.Short = "Manage your badges"
+	})
+
+	runBadgeListCmd = cobra.NewCommand(func(c *cobra.Command) {
+		c.Use = "list"
+		c.Short = "List your badges"
+		c.Aliases = []string{"ls"}
+		c.RunE = func(cmd *cobra.Command, args []string) error {
+			client, err := api.NewC(config.C().Douyu)
+			if err != nil {
+				return fmt.Errorf("new client error: %w", err)
+			}
+			badges, err := client.ListBadges()
+			if err != nil {
+				return fmt.Errorf("list badges error: %w", err)
+			}
+			fmt.Println(badges.TableString())
+			return nil
+		}
+	})
+)
 
 func init() {
-	runGiftCmd.PersistentFlags().Int("room-id", consts.RoomYYF, "room id")
-	osx.PE(config.BindPFlag("douyu.room", runGiftCmd.PersistentFlags().Lookup("room-id")))
-
-	runGiftSendCmd.PersistentFlags().Int("gift-id", consts.GiftGlowSticks, "gift id (268 or 2358)")
-	osx.PE(config.BindPFlag("douyu.gift", runGiftSendCmd.PersistentFlags().Lookup("gift-id")))
+	runCmd.AddCommand(runRefreshCmd)
 
 	runGiftCmd.AddCommand(runGiftListCmd)
 	runGiftCmd.AddCommand(runGiftSendCmd)
+	runCmd.AddCommand(runGiftCmd)
 
 	runBadgeCmd.AddCommand(runBadgeListCmd)
-
-	runCmd.AddCommand(runLoginCmd)
-	runCmd.AddCommand(runGiftCmd)
 	runCmd.AddCommand(runBadgeCmd)
+
+	rootCmd.AddCommand(runCmd)
+}
+
+func atoi(vs []string, idx int, def ...string) int {
+	v, _ := sliceutil.GetValue(vs, idx, def...)
+	i, _ := strconv.Atoi(v)
+	return i
 }

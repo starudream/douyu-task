@@ -1,15 +1,13 @@
 package api
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/olekukonko/tablewriter"
-
-	"github.com/starudream/go-lib/httpx"
+	"github.com/starudream/go-lib/core/v2/gh"
+	"github.com/starudream/go-lib/tablew/v2"
 
 	"github.com/starudream/douyu-task/consts"
 )
@@ -19,16 +17,7 @@ type Gifts struct {
 }
 
 func (gs *Gifts) TableString() string {
-	bb := &bytes.Buffer{}
-	tw := tablewriter.NewWriter(bb)
-	tw.SetAlignment(tablewriter.ALIGN_CENTER)
-	tw.SetHeader([]string{"name", "price", "count", "expire"})
-	for i := 0; i < len(gs.List); i++ {
-		g := gs.List[i]
-		tw.Append([]string{g.Name, strconv.Itoa(g.Price), strconv.Itoa(g.Count), time.Unix(int64(g.Met), 0).Format(time.DateTime)})
-	}
-	tw.Render()
-	return bb.String()
+	return tablew.Structs(gs.List)
 }
 
 func (gs *Gifts) Find(id int) *Gift {
@@ -58,9 +47,9 @@ type Gift struct {
 	Intimate int    `json:"intimate"` // 亲密度
 	Met      int    `json:"met"`      // 过期时间
 
-	Price     int `json:"price"`     // 价值
-	PriceType int `json:"priceType"` // 价值类型（不确定）2-免费礼物
-	PropType  int `json:"propType"`  // 礼物类型（不确定）2-免费礼物 5-等级礼包 6-分区喇叭
+	Price     int `json:"price"     table:",ignored"` // 价值
+	PriceType int `json:"priceType" table:",ignored"` // 价值类型（不确定）2-免费礼物
+	PropType  int `json:"propType"  table:",ignored"` // 礼物类型（不确定）2-免费礼物 5-等级礼包 6-分区喇叭
 }
 
 func (gift *Gift) GetCount() int {
@@ -87,10 +76,10 @@ type SendGiftResp struct {
 func (c *Client) SendGift(room, gift, count int) (*Gifts, error) {
 	roomId := strconv.Itoa(room)
 
-	resp, err := httpx.R().
+	resp, err := c.R().
 		SetCookies(c.genAuthCookies()).
 		SetHeader("referer", URL+"/"+roomId).
-		SetFormData(map[string]string{
+		SetFormData(gh.MS{
 			"roomId":    roomId,
 			"propId":    strconv.Itoa(gift),
 			"propCount": strconv.Itoa(count),
@@ -130,7 +119,7 @@ func (c *Client) ListGifts(rooms ...int) (*Gifts, error) {
 		return consts.RoomYYF
 	}()
 
-	resp, err := httpx.R().
+	resp, err := c.R().
 		SetCookies(c.genAuthCookies()).
 		SetHeader("referer", URL).
 		SetResult(&ListGiftResp{}).

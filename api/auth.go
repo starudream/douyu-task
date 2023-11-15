@@ -5,12 +5,10 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/starudream/go-lib/httpx"
 )
 
 func (c *Client) Refresh() error {
-	resp, err := httpx.R().
+	resp, err := c.R().
 		SetCookie(&http.Cookie{Name: "dy_did", Value: c.Did}).
 		SetCookie(&http.Cookie{Name: "LTP0", Value: c.Ltp0}).
 		SetHeader("referer", URL).

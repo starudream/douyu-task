@@ -1,9 +1,3 @@
-# 调试模式，打印更多日志
-debug: false
-
-# 无视过期时间, 直接送, 默认关闭
-withOutTimeCheck: false
-
 # 计划任务
 cron:
   # 刷新背包荧光棒，每天 00:10:00 获取一次
@@ -21,6 +15,9 @@ douyu:
   # 每日登录直播间号
   room: 9999
 
+  # 无视免费礼物过期时间，默认关闭
+  ignore_expired_check: false
+
   # 荧光棒分配
   assigns:
     # { room, count, all }
@@ -32,13 +29,3 @@ douyu:
       count: 10
     - room: 9999
       all: true
-
-# 钉钉机器人通知
-dingtalk:
-  token: xxx
-  secret: xxx
-
-# Telegram 机器人通知
-telegram:
-  token: xxx
-  chat_id: xxx

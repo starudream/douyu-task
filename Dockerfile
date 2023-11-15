@@ -2,6 +2,6 @@ FROM starudream/alpine
 
 WORKDIR /
 
-COPY douyu-task /app
+COPY douyu-task /douyu-task
 
-CMD /app
+CMD /douyu-task
