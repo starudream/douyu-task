@@ -18,21 +18,25 @@ var cronCmd = cobra.NewCommand(func(c *cobra.Command) {
 	c.Use = "cron"
 	c.Short = "Run as cron job"
 	c.RunE = func(cmd *cobra.Command, args []string) error {
-		err1 := cron.AddJob(config.C().Cron.Refresh, "douyu-cron-refresh", cronRefresh)
-		if err1 != nil {
-			return fmt.Errorf("add cron job error: %w", err1)
-		}
-		err2 := cron.AddJob(config.C().Cron.Renewal, "douyu-cron-renewal", cronRenewal)
-		if err2 != nil {
-			return fmt.Errorf("add cron job error: %w", err2)
-		}
-		cron.Run()
-		return nil
+		return cronRun()
 	}
 })
 
 func init() {
 	rootCmd.AddCommand(cronCmd)
+}
+
+func cronRun() error {
+	err1 := cron.AddJob(config.C().Cron.Refresh, "douyu-cron-refresh", cronRefresh)
+	if err1 != nil {
+		return fmt.Errorf("add cron job error: %w", err1)
+	}
+	err2 := cron.AddJob(config.C().Cron.Renewal, "douyu-cron-renewal", cronRenewal)
+	if err2 != nil {
+		return fmt.Errorf("add cron job error: %w", err2)
+	}
+	cron.Run()
+	return nil
 }
 
 func cronRefresh() {

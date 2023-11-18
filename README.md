@@ -64,6 +64,7 @@ Usage:
 Available Commands:
   cron        Run as cron job
   run         Run douyu job manually
+  service     Manage service
 
 Flags:
   -c, --config string   path to config file
@@ -97,7 +98,17 @@ douyu-task run gift send <room id> <gift id> <count>
 ### Run Cron
 
 ```shell
+douyu-task
 douyu-task cron
+```
+
+### Service
+
+```shell
+# register as system service
+douyu-task service --user --config douyu-task.yaml install
+douyu-task service start
+douyu-task service status
 ```
 
 ## Docker Compose
