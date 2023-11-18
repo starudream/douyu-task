@@ -17,6 +17,9 @@ import (
 type Badges []*Badge
 
 func (bs Badges) TableString() string {
+	if len(bs) == 0 {
+		return "empty badges"
+	}
 	return tablew.Structs(bs)
 }
 

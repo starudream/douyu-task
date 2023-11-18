@@ -17,6 +17,9 @@ type Gifts struct {
 }
 
 func (gs *Gifts) TableString() string {
+	if len(gs.List) == 0 {
+		return "empty gifts"
+	}
 	return tablew.Structs(gs.List)
 }
 
