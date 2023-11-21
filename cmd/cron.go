@@ -50,7 +50,7 @@ func cronRefresh() {
 		slog.Info(msg)
 	}
 	err = ntfy.Notify(context.Background(), msg)
-	if err != nil {
+	if err != nil && !errors.Is(err, ntfy.ErrNoConfig) {
 		slog.Error("cron notify error: %v", err)
 	}
 	return
@@ -70,7 +70,7 @@ func cronRenewal() {
 		slog.Info(msg)
 	}
 	err = ntfy.Notify(context.Background(), msg)
-	if err != nil {
+	if err != nil && !errors.Is(err, ntfy.ErrNoConfig) {
 		slog.Error("cron notify error: %v", err)
 	}
 	return

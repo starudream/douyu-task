@@ -63,6 +63,7 @@ Usage:
 
 Available Commands:
   cron        Run as cron job
+  notify      Manage notify
   run         Run douyu job manually
   service     Manage service
 
