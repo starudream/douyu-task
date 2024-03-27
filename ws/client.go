@@ -1,7 +1,9 @@
 package ws
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"strconv"
 	"sync"
 	"time"
@@ -38,12 +40,21 @@ type LoginParams struct {
 	Username string
 }
 
+var dialer = &websocket.Dialer{
+	Proxy: http.ProxyFromEnvironment,
+	TLSClientConfig: &tls.Config{
+		CipherSuites: tlsCipherSuites,
+		MinVersion:   tls.VersionTLS10,
+	},
+	HandshakeTimeout: 10 * time.Second,
+}
+
 func Login(p LoginParams) error {
 	if p.Room <= 0 {
 		p.Room = consts.RoomYYF
 	}
 
-	conn, _, err := websocket.DefaultDialer.Dial(URL, nil)
+	conn, _, err := dialer.Dial(URL, nil)
 	if err != nil {
 		return err
 	}
