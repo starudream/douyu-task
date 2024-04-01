@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/starudream/go-lib/cobra/v2 v2.0.7
-	github.com/starudream/go-lib/core/v2 v2.0.21
+	github.com/starudream/go-lib/core/v2 v2.0.22
 	github.com/starudream/go-lib/cron/v2 v2.0.7
 	github.com/starudream/go-lib/ntfy/v2 v2.0.10
 	github.com/starudream/go-lib/resty/v2 v2.0.10
