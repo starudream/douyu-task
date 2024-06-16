@@ -3,27 +3,27 @@ module github.com/starudream/douyu-task
 go 1.22
 
 require (
-	github.com/starudream/go-lib/cobra/v2 v2.0.8
-	github.com/starudream/go-lib/core/v2 v2.0.23
-	github.com/starudream/go-lib/cron/v2 v2.0.8
+	github.com/starudream/go-lib/cobra/v2 v2.0.10
+	github.com/starudream/go-lib/core/v2 v2.0.26
+	github.com/starudream/go-lib/cron/v2 v2.0.9
 	github.com/starudream/go-lib/ntfy/v2 v2.0.11
-	github.com/starudream/go-lib/resty/v2 v2.0.11
-	github.com/starudream/go-lib/service/v2 v2.0.5
+	github.com/starudream/go-lib/resty/v2 v2.0.12
+	github.com/starudream/go-lib/service/v2 v2.0.6
 	github.com/starudream/go-lib/tablew/v2 v2.0.6
 )
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/websocket v1.5.1
-	golang.org/x/net v0.24.0
+	github.com/gorilla/websocket v1.5.3
+	golang.org/x/net v0.26.0
 )
 
 require (
-	github.com/fatih/color v1.16.0 // indirect
+	github.com/fatih/color v1.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.15.1 // indirect
-	github.com/go-resty/resty/v2 v2.12.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.0.0-alpha.1 // indirect
-	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/go-resty/resty/v2 v2.13.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.0.0 // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/goccy/go-yaml v1.11.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kardianos/service v1.2.2 // indirect
@@ -40,12 +40,11 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
-	github.com/samber/lo v1.39.0 // indirect
+	github.com/samber/lo v1.44.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/cobra v1.8.0 // indirect
+	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
-	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 )
